@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/paul/Code/learn-opengl/build",
+  "command": "/usr/bin/c++   -g -o CMakeFiles/learn-opengl.dir/src/main.cpp.o -c /home/paul/Code/learn-opengl/src/main.cpp",
+  "file": "/home/paul/Code/learn-opengl/src/main.cpp"
+}
+]

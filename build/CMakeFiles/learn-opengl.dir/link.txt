@@ -1,0 +1,1 @@
+/usr/bin/c++ -g -rdynamic CMakeFiles/learn-opengl.dir/src/main.cpp.o -o learn-opengl  -lGL -lGLEW -lglfw 
