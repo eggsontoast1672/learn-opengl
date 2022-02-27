@@ -1,8 +1,43 @@
+#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+struct ShaderProgramSource {
+    std::string vertex;
+    std::string fragment;
+};
+
+static ShaderProgramSource ParseShader(const std::string& file) {
+    enum class ShaderType {
+        NONE = -1,
+        VERTEX = 0,
+        FRAGMENT = 1
+    };
+
+    std::ifstream stream(file);
+    std::string line;
+    std::stringstream ss[2];
+
+    ShaderType type = ShaderType::NONE;
+
+    while (getline(stream, line)) {
+        if (line.find("#shader") != std::string::npos) {
+            if (line.find("vertex") != std::string::npos)
+                type = ShaderType::VERTEX;
+
+            else if (line.find("fragment") != std::string::npos)
+                type = ShaderType::FRAGMENT;
+        } else {
+            ss[(int)type] << line << '\n';
+        }
+    }
+
+    return { ss[0].str(), ss[1].str() };
+}
 
 static unsigned int CompileShader(unsigned int type, const std::string& source) {
     unsigned int id = glCreateShader(type);
@@ -22,7 +57,7 @@ static unsigned int CompileShader(unsigned int type, const std::string& source) 
         const char *typeFmt;
         if (type == GL_VERTEX_SHADER) typeFmt = "vertex";
         else if (type == GL_FRAGMENT_SHADER) typeFmt = "fragment";
-        std::cout << "Failed to compile " << typeFmt << "shader: " << message << std::endl;
+        std::cout << "Failed to compile " << typeFmt << " shader: " << message << std::endl;
 
         glDeleteShader(id);
 
@@ -88,8 +123,11 @@ int main(void) {
         "color = vec4(1.0f, 0.0f, 0.0f, 1.0f);"
         "}";
 
-    unsigned int shader = CreateShader(vertexSource, fragmentSource);
+    ShaderProgramSource source = ParseShader("../res/shaders/basic.shader");
+    unsigned int shader = CreateShader(source.vertex, source.fragment);
     glUseProgram(shader);
+
+    
 
     /* Create a vertex buffer and put data inside it */
     unsigned int buffer;
