@@ -1,0 +1,5 @@
+# Visual Studio Code IDE folder
+.vscode/
+
+# Cmake build directory
+build/
