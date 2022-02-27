@@ -1,7 +1,52 @@
 #include <iostream>
+#include <string>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+static unsigned int CompileShader(unsigned int type, const std::string& source) {
+    unsigned int id = glCreateShader(type);
+    const char *src = source.c_str();
+    glShaderSource(id, 1, &src, nullptr);
+    glCompileShader(id);
+
+    // TODO: Handle shader compilation errors
+    int result;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+    if (result == GL_FALSE) {
+        int length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
+        char message[length];
+        glGetShaderInfoLog(id, length, &length, message);
+
+        const char *typeFmt;
+        if (type == GL_VERTEX_SHADER) typeFmt = "vertex";
+        else if (type == GL_FRAGMENT_SHADER) typeFmt = "fragment";
+        std::cout << "Failed to compile " << typeFmt << "shader: " << message << std::endl;
+
+        glDeleteShader(id);
+
+        return 0;
+    }
+
+    return id;
+}
+
+static unsigned int CreateShader(const std::string& vertexSource, const std::string& fragmentSource) {
+    unsigned int program = glCreateProgram();
+    unsigned int vs = CompileShader(GL_VERTEX_SHADER, vertexSource);
+    unsigned int fs = CompileShader(GL_FRAGMENT_SHADER, fragmentSource);
+
+    glAttachShader(program, vs);
+    glAttachShader(program, fs);
+    glLinkProgram(program);
+    glValidateProgram(program);
+
+    glDeleteShader(vs);
+    glDeleteShader(fs);
+
+    return program;
+}
 
 int main(void) {
     if (glfwInit() != GLFW_TRUE) {
@@ -30,6 +75,22 @@ int main(void) {
          0.5f, -0.5f
     };
 
+    std::string vertexSource =
+        "#version 330 core\n"
+        "layout(location = 0) in vec4 position;"
+        "void main() {"
+        "gl_Position = position;"
+        "}";
+    std::string fragmentSource =
+        "#version 330 core\n"
+        "layout(location = 0) out vec4 color;"
+        "void main() {"
+        "color = vec4(1.0f, 0.0f, 0.0f, 1.0f);"
+        "}";
+
+    unsigned int shader = CreateShader(vertexSource, fragmentSource);
+    glUseProgram(shader);
+
     /* Create a vertex buffer and put data inside it */
     unsigned int buffer;
     glGenBuffers(1, &buffer);
@@ -38,6 +99,8 @@ int main(void) {
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     while (!glfwWindowShouldClose(window)) {
         /* Render here */
@@ -52,6 +115,7 @@ int main(void) {
         glfwPollEvents();
     }
 
+    glDeleteProgram(shader);
     glfwTerminate();
 
     return 0;
