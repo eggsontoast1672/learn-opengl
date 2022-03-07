@@ -32,7 +32,6 @@ int main() {
         return -1;
     }
 
-    /* Debug output */
     std::printf("OpenGL version: %s\n", glGetString(GL_VERSION));
 
     float positions[] = {
