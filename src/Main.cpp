@@ -5,6 +5,7 @@
 #include <GL/glew.h>                    // glewInit
 #include <GLFW/glfw3.h>                 // glfwInit
 
+#include "IndexBuffer.h"                // snbl::IndexBuffer
 #include "Renderer.h"                   // SNBL_GLCALL
 #include "Shader.h"                     // snbl::readShaderVF
 #include "VertexBuffer.h"               // snbl::VertexBuffer
@@ -52,10 +53,7 @@ int main() {
     SNBL_GLCALL(glEnableVertexAttribArray(0));
     SNBL_GLCALL(glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
 
-    unsigned int ibo;
-    SNBL_GLCALL(glGenBuffers(1, &ibo));
-    SNBL_GLCALL(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo));
-    SNBL_GLCALL(glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(unsigned int), indices, GL_STATIC_DRAW));
+    snbl::IndexBuffer ib(6, indices);
 
     snbl::ShaderSource source = snbl::readShaderVF(
         "../res/shaders/basic.vert",
