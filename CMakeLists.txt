@@ -15,11 +15,11 @@ add_executable(
 
 set_property(TARGET main PROPERTY C_STANDARD 90)
 
-target_include_directories(
-    main
-    PRIVATE
-    inc/
-)
+# target_include_directories(
+#     main
+#     PRIVATE
+#     inc/
+# )
 
 target_link_libraries(
     main
